@@ -53,13 +53,13 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <navigationItem key="navigationItem" title="Создать" id="smJ-bI-7eT">
-                        <barButtonItem key="leftBarButtonItem" title="Отменить" id="4ES-WM-84h">
+                        <barButtonItem key="leftBarButtonItem" title="Отменить" style="done" id="4ES-WM-84h">
                             <color key="tintColor" red="0.63137254899999995" green="0.086274509799999996" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="cancelAction:" destination="sj1-Jh-JJM" id="vfO-hf-dDR"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Сохранить" id="yf6-Gw-OJP">
+                        <barButtonItem key="rightBarButtonItem" title="Сохранить" style="done" id="yf6-Gw-OJP">
                             <color key="tintColor" red="0.63137254899999995" green="0.086274509799999996" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="createAction:" destination="sj1-Jh-JJM" id="FAK-VH-efp"/>

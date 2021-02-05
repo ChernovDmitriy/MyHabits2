@@ -11,12 +11,12 @@ class Styles {
     //MARK: colors
     static let darkGrayColor: UIColor = .systemGray
     static let mediumGrayColor: UIColor = .systemGray2
-    static let lightGrayColor: UIColor = UIColor(displayP3Red: 242, green: 242, blue: 247, alpha: 0)
-    static let violetColor: UIColor = UIColor(displayP3Red: 161, green: 22, blue: 204, alpha: 0)
-    static let blueColor: UIColor = UIColor(displayP3Red: 41, green: 109, blue: 255, alpha: 0)
-    static let greenColor: UIColor = UIColor(displayP3Red: 29, green: 179, blue: 34, alpha: 0)
-    static let purpleColor: UIColor = UIColor(displayP3Red: 98, green: 54, blue: 255, alpha: 0)
-    static let orangeColor: UIColor = UIColor(displayP3Red: 255, green: 179, blue: 79, alpha: 0)
+    static let lightGrayColor: UIColor = UIColor(displayP3Red: 242, green: 242, blue: 247, alpha: 1)
+    static let violetColor: UIColor = UIColor(displayP3Red: 161, green: 22, blue: 204, alpha: 1)
+    static let blueColor: UIColor = UIColor(displayP3Red: 41, green: 109, blue: 255, alpha: 1)
+    static let greenColor: UIColor = UIColor(displayP3Red: 29, green: 179, blue: 34, alpha: 1)
+    static let purpleColor: UIColor = UIColor(displayP3Red: 98, green: 54, blue: 255, alpha: 1)
+    static let orangeColor: UIColor = UIColor(displayP3Red: 255, green: 179, blue: 79, alpha: 1)
     
 //    //MARK: fonts
 //    static let title3Font: UIFont = UIFont.systemFont(ofSize: 20)

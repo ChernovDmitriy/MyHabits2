@@ -37,7 +37,6 @@ class HabitsViewController: UIViewController {
         super.viewDidLoad()
         print("\(self) view did load")
         setupLayout()
-        callbackStore.callback = self
     }
     
     
@@ -81,10 +80,25 @@ extension HabitsViewController : UICollectionViewDataSource {
         ) as! HabitCollectionViewCell
         
         let habit = habitStore.habits[indexPath.item]
-        cell.setData(name: habit.name, dateString: habit.dateString, color: habit.color)
+        cell.setData(
+            position: indexPath.item,
+            name: habit.name,
+            dateString: habit.dateString,
+            color: habit.color,
+            habitTapCallback: self
+        )
         return cell
     }
     
+}
+
+extension HabitsViewController : HabitTapCallback {
+    func onTap(position: Int) {
+        let controller = HabitViewController()
+        controller.habitPosition = position
+        controller.habit = habitStore.habits[position]
+        present(controller, animated: true, completion: nil)
+    }
 }
 
 extension HabitsViewController: UICollectionViewDelegate {

@@ -7,16 +7,24 @@
 
 import UIKit
 
-class HabitCollectionViewCell: UICollectionViewCell {
+protocol HabitTapCallback {
+    func onTap(position: Int)
+}
+
+class HabitCollectionViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
+    
+ 
+    private var habitTapCallback: HabitTapCallback? = nil
     
     private let baseInset: CGFloat = 20
     private let imageSize: CGFloat = 36
+    
+    private var cellPosition: Int = 0
     
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.toAutoLayout()
         label.applyHeadlineStyle()
-
         
         return label
     }()
@@ -55,17 +63,32 @@ class HabitCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setData(name: String, dateString: String, color: UIColor) {
+    @objc func habitTap() {
+        habitTapCallback?.onTap(position: cellPosition)
+    }
+    
+    func setData(
+        position: Int,
+        name: String,
+        dateString: String,
+        color: UIColor,
+        habitTapCallback: HabitTapCallback?
+    ) {
         print("setData: name: \(name), dateString: \(dateString), color: \(color)")
+        cellPosition = position
         nameLabel.text = name
         dateLabel.text = dateString
-        dateLabel.text = "Каждый день в \(dateString)"
         imageView.layer.borderColor = color.cgColor
+        self.habitTapCallback = habitTapCallback
     }
     
     private func initLayout() {
         contentView.layer.cornerRadius = 8
         contentView.layer.masksToBounds = true
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(habitTap))
+        tapGestureRecognizer.delegate = self
+        
+        contentView.addGestureRecognizer(tapGestureRecognizer)
         
         contentView.addSubview(nameLabel)
         contentView.addSubview(dateLabel)

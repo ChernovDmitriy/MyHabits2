@@ -14,6 +14,9 @@ class HabitViewController: UIViewController {
     
     private var habitColor: UIColor = .orange
     
+    var habitPosition: Int? = nil
+    var habit: Habit? = nil
+    
     private lazy var habitStore: HabitsStore = {
         return HabitsStore.shared
     }()
@@ -32,6 +35,9 @@ class HabitViewController: UIViewController {
         textField.toAutoLayout()
         
         textField.placeholder = "Бегать по утрам, спать 8 часов и т.п."
+        if habit != nil {
+            textField.text = habit?.name
+        }
         
         return textField
     }()
@@ -50,7 +56,7 @@ class HabitViewController: UIViewController {
         imageView.toAutoLayout()
         
         imageView.isUserInteractionEnabled = true
-        imageView.backgroundColor = habitColor
+        imageView.backgroundColor = habit != nil ? habit?.color : habitColor
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = imageSize/2
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(colorViewTap))
@@ -73,6 +79,7 @@ class HabitViewController: UIViewController {
     private lazy var timeLabel: UILabel = {
         let label = UILabel()
         label.toAutoLayout()
+        label.text = habit != nil ? habit?.dateString : "Каждый день в ".uppercased()
         
         return label
     }()
@@ -83,8 +90,26 @@ class HabitViewController: UIViewController {
         
         picker.datePickerMode = .time
         picker.preferredDatePickerStyle = .wheels
+        if (habit != nil) {
+            picker.date = habit!.date
+        }
         picker.addTarget(self, action: #selector(datePickerChange(picker:)), for: .valueChanged)
         return picker
+    }()
+    
+    
+    private lazy var deleteHabitLabel: UILabel = {
+        let label = UILabel()
+        label.toAutoLayout()
+        label.text = "Удалить привычку"
+        label.textColor = .red
+        
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(deleteHabitTap))
+        tapGestureRecognizer.delegate = self
+        
+        label.addGestureRecognizer(tapGestureRecognizer)
+        
+        return label
     }()
     
     @IBAction func createAction(_ sender: Any) {
@@ -113,11 +138,23 @@ class HabitViewController: UIViewController {
         present(controller, animated: true, completion: nil)
     }
     
+    
+    @objc func deleteHabitTap() {
+        if (habitPosition != nil) {
+            habitStore.habits.remove(at: habitPosition!)
+        }
+        HabitViewControllerCallbackStore.instance.callback?.onNewHabit()
+        popBack()
+    }
+    
     @objc func datePickerChange(picker: UIDatePicker) {
         print("change time to \(picker.date)")
+        habit?.date = picker.date
+        timeLabel.text = habit?.dateString
     }
     
     private func initLayout() {
+        view.backgroundColor = .white
         view.addSubview(nameTitleLabel)
         view.addSubview(nameTextField)
         view.addSubview(colorTitleLabel)
@@ -125,11 +162,14 @@ class HabitViewController: UIViewController {
         view.addSubview(timeTitleLabel)
         view.addSubview(timeLabel)
         view.addSubview(timePicker)
+        if (habitPosition != nil) {
+            view.addSubview(deleteHabitLabel)
+        }
     }
     
     private func initConstraints() {
 //        let hackTop: CGFloat = 50
-        let constraints = [
+        var constraints = [
             nameTitleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 22),
             nameTitleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: horizontalInset),
             
@@ -154,16 +194,32 @@ class HabitViewController: UIViewController {
             timePicker.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             timePicker.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ]
+        if (habit != nil) {
+            constraints.append(contentsOf: [
+                deleteHabitLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                deleteHabitLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -26)
+            ])
+        } else {
+            habit = Habit(
+                name: nameTextField.text ?? "",
+                date: timePicker.date,
+                color: colorImageView.backgroundColor ?? habitColor
+            )
+            timeLabel.text = habit?.dateString
+        }
         NSLayoutConstraint.activate(constraints)
     }
     
     private func saveHabit() {
-        let habit = Habit(
-            name: nameTextField.text ?? "",
-            date: timePicker.date,
-            color: colorImageView.backgroundColor ?? habitColor
-        )
-        habitStore.habits.append(habit)
+        habit?.color = colorImageView.backgroundColor ?? habitColor
+        habit?.date = timePicker.date
+        habit?.name = nameTextField.text ?? ""
+        if (habitPosition != nil) {
+            habitStore.habits.remove(at: habitPosition!)
+            habitStore.habits.insert(habit!, at: habitPosition!)
+        } else {
+            habitStore.habits.append(habit!)
+        }
         HabitViewControllerCallbackStore.instance.callback?.onNewHabit()
     }
     
