@@ -7,22 +7,19 @@
 
 import UIKit
 
-class InfoViewController: UIViewController {
-    
-    private let titleInset: CGFloat = 22
-    private let baseInset: CGFloat = 16
+class InfoViewController: UIViewController, UIScrollViewDelegate {
     
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.toAutoLayout()
-        
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.delegate = self
         return scrollView
     }()
     
-    private lazy var contentView: UIView = {
+    private let contentView: UIView = {
         let view = UIView()
         view.toAutoLayout()
-        
         return view
     }()
     
@@ -30,7 +27,7 @@ class InfoViewController: UIViewController {
         let label = UILabel()
         label.toAutoLayout()
         label.applyTitle3Style()
-        
+        label.text = InfoStorage.headerText
         return label
     }()
     
@@ -38,53 +35,41 @@ class InfoViewController: UIViewController {
         let label = UILabel()
         label.toAutoLayout()
         label.applyBodyStyle()
-        
         label.numberOfLines = 0
+        label.text = InfoStorage.bodyText
         return label
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.navigationBar.topItem?.title = "Информация"
         setupLayout()
-        setupConstraints()
-        setData(title: InfoStorage.headerText, body: InfoStorage.bodyText)
     }
     
     private func setupLayout() {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
-        
         contentView.addSubview(titleLabel)
         contentView.addSubview(bodyLabel)
-    }
-    
-    private func setupConstraints() {
+        
         let constraints = [
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: titleInset),
-            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: baseInset),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -baseInset),
-            
-            bodyLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: baseInset),
-            bodyLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: baseInset),
-            bodyLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -baseInset),
-            bodyLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -baseInset)
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 22),
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            bodyLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16),
+            bodyLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            bodyLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            bodyLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
         ]
         NSLayoutConstraint.activate(constraints)
-    }
-    
-    private func setData(title: String, body: String) {
-        titleLabel.text = title
-        bodyLabel.text = body
     }
 }

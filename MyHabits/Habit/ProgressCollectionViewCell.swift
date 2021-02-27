@@ -9,74 +9,68 @@ import UIKit
 
 class ProgressCollectionViewCell: UICollectionViewCell {
     
-    private let verticalInset: CGFloat = 10
-    private let horizontalInset: CGFloat = 12
-    
-    private lazy var progressView: UIProgressView = {
-        let pv = UIProgressView()
-        pv.toAutoLayout()
-        
-        pv.backgroundColor = Styles.mediumGrayColor
-        pv.progressTintColor = Styles.violetColor
-        pv.layer.cornerRadius = 4
-        pv.layer.masksToBounds = true
-        
-        return pv
-    }()
-    
-    private lazy var titleLabel: UILabel = {
+    private lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.toAutoLayout()
-        label.applyFootnoteStyle()
+        label.text = "Все получится!"
+        label.applyStatusFootnoteStyle()
         
         return label
     }()
     
-    private lazy var percentLabel: UILabel = {
+    private var habitSlider: UISlider = {
+        let slider = UISlider()
+        slider.toAutoLayout()
+        slider.setThumbImage(UIImage(), for: .normal)
+        slider.setValue(HabitsStore.shared.todayProgress, animated: true)
+        slider.tintColor = Styles.purpleColor
+        
+        return slider
+    }()
+    
+    private lazy var statusLabel: UILabel = {
         let label = UILabel()
         label.toAutoLayout()
         label.applyFootnoteStyle()
+        label.text = String(Int(HabitsStore.shared.todayProgress * 100)) + "%"
         
         return label
     }()
     
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        initLayout()
+    func show() {
+        habitSlider.setValue(HabitsStore.shared.todayProgress, animated: true)
+        statusLabel.text = String(Int(HabitsStore.shared.todayProgress * 100)) + "%"
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        initLayout()
-    }
-
-    func setData(progress: Int, title: String) {
-        progressView.progress = Float(progress)
-        titleLabel.text = title
+        setupLayout()
     }
     
-    private func initLayout() {
-        contentView.layer.cornerRadius = 8
-        contentView.layer.masksToBounds = true
-        
-        contentView.addSubview(progressView)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(percentLabel)
-        
-        initConstraints()
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupLayout()
     }
     
-    private func initConstraints() {
+    private func setupLayout() {
+        contentView.roundCornerWithRadius(4, top: true, bottom: true, shadowEnabled: false)
+        contentView.backgroundColor = .white
+        contentView.addSubview(nameLabel)
+        contentView.addSubview(habitSlider)
+        contentView.addSubview(statusLabel)
+        
         let constraints = [
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: verticalInset),
-            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: horizontalInset),
+            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
             
-            percentLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: verticalInset),
-            percentLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: horizontalInset),
+            habitSlider.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 10),
+            habitSlider.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
+            habitSlider.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
+            habitSlider.heightAnchor.constraint(equalToConstant: 7),
+            habitSlider.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -15),
             
-            progressView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: verticalInset),
-            progressView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: horizontalInset),
-            progressView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: horizontalInset)
+            statusLabel.topAnchor.constraint(equalTo: nameLabel.topAnchor),
+            statusLabel.trailingAnchor.constraint(equalTo: habitSlider.trailingAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
     }

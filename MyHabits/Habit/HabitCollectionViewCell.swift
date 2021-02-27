@@ -11,20 +11,20 @@ protocol HabitTapCallback {
     func onTap(position: Int)
 }
 
-class HabitCollectionViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
+class HabitCollectionViewCell: UICollectionViewCell {
     
- 
-    private var habitTapCallback: HabitTapCallback? = nil
+    var habitTapCallback: (() -> Void)?
     
     private let baseInset: CGFloat = 20
     private let imageSize: CGFloat = 36
     
-    private var cellPosition: Int = 0
+    var habit = Habit(name: "Выпить стакан воды перед завтраком", date: Date(), color: .systemRed)
     
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.toAutoLayout()
         label.applyHeadlineStyle()
+        label.numberOfLines = 2
         
         return label
     }()
@@ -32,27 +32,40 @@ class HabitCollectionViewCell: UICollectionViewCell, UIGestureRecognizerDelegate
     private lazy var dateLabel: UILabel = {
         let label = UILabel()
         label.toAutoLayout()
-        label.applyCaptionStyle()
+        label.applyFootnoteStyle()
+        label.textColor = .systemGray
         
         return label
     }()
     
-    
-    private lazy var countLabel: UILabel = {
+    private lazy var trackerLabel: UILabel = {
         let label = UILabel()
         label.toAutoLayout()
-        label.applyFootnoteStyle()
+        label.applyCaptionStyle()
+        label.text = "Подряд: \(habit.trackDates.count)"
+        label.textColor = .systemGray
         
         return label
     }()
     
-    private lazy var imageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.toAutoLayout()
-        imageView.layer.masksToBounds = true
+    private lazy var checkBoxButton: UIButton = {
+        let button = UIButton()
+        button.roundCornerWithRadius(18, top: true, bottom: true, shadowEnabled: false)
+        button.toAutoLayout()
+        button.backgroundColor = .white
+        button.layer.borderWidth = 2
+        button.addTarget(self, action: #selector(checkBoxButtonPressed), for: .touchUpInside)
         
-        return imageView
+        return button
     }()
+    
+    @objc func checkBoxButtonPressed() {
+        if !habit.isAlreadyTakenToday {
+            HabitsStore.shared.track(habit)
+            checkBoxButton.backgroundColor = habit.color
+        }
+        habitTapCallback?()
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -60,61 +73,50 @@ class HabitCollectionViewCell: UICollectionViewCell, UIGestureRecognizerDelegate
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        super.init(coder: coder)
+        initLayout()
     }
     
-    @objc func habitTap() {
-        habitTapCallback?.onTap(position: cellPosition)
-    }
-    
-    func setData(
-        position: Int,
-        name: String,
-        dateString: String,
-        color: UIColor,
-        habitTapCallback: HabitTapCallback?
-    ) {
-        print("setData: name: \(name), dateString: \(dateString), color: \(color)")
-        cellPosition = position
-        nameLabel.text = name
-        dateLabel.text = dateString
-        imageView.layer.borderColor = color.cgColor
-        self.habitTapCallback = habitTapCallback
+    func setData(habit: Habit) {
+        self.habit = habit
+        
+        nameLabel.textColor = habit.color
+        nameLabel.text = habit.name
+        dateLabel.text = habit.dateString
+        checkBoxButton.layer.borderColor = habit.color.cgColor
+        trackerLabel.text = "Подряд: \(habit.trackDates.count)"
+        
+        if habit.isAlreadyTakenToday {
+            checkBoxButton.backgroundColor = habit.color
+        } else {
+            checkBoxButton.backgroundColor = .white
+        }
     }
     
     private func initLayout() {
-        contentView.layer.cornerRadius = 8
-        contentView.layer.masksToBounds = true
-        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(habitTap))
-        tapGestureRecognizer.delegate = self
-        
-        contentView.addGestureRecognizer(tapGestureRecognizer)
+        contentView.roundCornerWithRadius(6, top: true, bottom: true, shadowEnabled: false)
+        contentView.backgroundColor = .white
         
         contentView.addSubview(nameLabel)
         contentView.addSubview(dateLabel)
-        contentView.addSubview(countLabel)
-        contentView.addSubview(imageView)
+        contentView.addSubview(trackerLabel)
+        contentView.addSubview(checkBoxButton)
         
-        initConstraints()
-    }
-    
-    private func initConstraints() {
         let constraints = [
-            contentView.heightAnchor.constraint(equalToConstant: 130),
-            
             nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: baseInset),
             nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: baseInset),
+            nameLabel.trailingAnchor.constraint(equalTo: checkBoxButton.leadingAnchor, constant: -baseInset),
             
             dateLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 4),
-            dateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: baseInset),
+            dateLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
             
-            countLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: baseInset),
-            countLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            trackerLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
+            trackerLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -baseInset),
             
-            imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -26),
-            imageView.widthAnchor.constraint(equalToConstant: imageSize),
-            imageView.heightAnchor.constraint(equalToConstant: imageSize),
+            checkBoxButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -26),
+            checkBoxButton.heightAnchor.constraint(equalToConstant: imageSize),
+            checkBoxButton.widthAnchor.constraint(equalToConstant: imageSize),
+            checkBoxButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -47)
         ]
         NSLayoutConstraint.activate(constraints)
     }

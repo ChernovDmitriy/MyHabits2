@@ -5,7 +5,7 @@
 //  Created by Dmitriy Chernov on 12.12.2020.
 //
 
-class InfoStorage {
+struct InfoStorage {
     static let headerText: String = "Привычка за 21 день"
     
     static let bodyText: String =
