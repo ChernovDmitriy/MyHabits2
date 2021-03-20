@@ -16,6 +16,10 @@ class HabitDetailsViewController: UIViewController {
     
     var habit = Habit(name: "Выпить стакан воды перед завтраком", date: Date(), color: .systemRed)
     
+    private lazy var habitDates: [Date] = {
+        HabitsStore.shared.dates.reversed()
+    }()
+    
     private lazy var habitTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.toAutoLayout()
@@ -101,16 +105,13 @@ extension HabitDetailsViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         let cell = tableView.dequeueReusableCell(
             withIdentifier: HabitDetailViewCell.reuseID,
             for: indexPath
         ) as! HabitDetailViewCell
         
-        let storeDates: [Date] = HabitsStore.shared.dates.reversed()
-        
-        if HabitsStore.shared.habit(habit, isTrackedIn: storeDates[indexPath.row]) {
-            cell.textLabel?.text = dateFormatter.string(from: storeDates[indexPath.row])
+        if HabitsStore.shared.habit(habit, isTrackedIn: habitDates[indexPath.row]) {
+            cell.textLabel?.text = dateFormatter.string(from: habitDates[indexPath.row])
         }
         
         return cell
