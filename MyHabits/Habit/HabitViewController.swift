@@ -134,7 +134,10 @@ class HabitViewController: UIViewController {
     }
     
     @objc func actionSaveButton(_ sender: Any) {
-        habit.name = nameTextField.text ?? ""
+        habit.name = nameTextField.text ?? habit.name
+        if let color = colorPickerView.backgroundColor {
+            habit.color = color
+        }
         
         switch habitEditionState {
             case .creation: do {
@@ -143,9 +146,10 @@ class HabitViewController: UIViewController {
             }
             case .edition: do {
                 habit.date = datepicker.date
-                habit.color = colorPickerViewController.selectedColor
+                
             }
         }
+        habitStore.save()
         updateCollectionCallback?.onCollectionUpdate()
         dismiss(animated: true, completion: nil)
     }
@@ -278,9 +282,7 @@ class HabitViewController: UIViewController {
 extension HabitViewController: UIColorPickerViewControllerDelegate {
     
     func colorPickerViewControllerDidSelectColor(_ viewController: UIColorPickerViewController) {
-        if habitEditionState == .creation {
-            habit.color = colorPickerViewController.selectedColor
-        }
+        habit.color = colorPickerViewController.selectedColor
         
         colorPickerView.backgroundColor = colorPickerViewController.selectedColor
     }
