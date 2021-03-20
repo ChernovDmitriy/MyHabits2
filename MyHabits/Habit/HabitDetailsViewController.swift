@@ -20,6 +20,13 @@ class HabitDetailsViewController: UIViewController {
         HabitsStore.shared.dates.reversed()
     }()
     
+    private lazy var imageView: UIImageView? = {
+        let imageView = UIImageView(image: UIImage.init(systemName: "checkmark"))
+        imageView.tintColor = Styles.purpleColor
+        
+        return imageView
+    }()
+    
     private lazy var habitTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.toAutoLayout()
@@ -84,8 +91,6 @@ extension HabitDetailsViewController: HabitDetailsViewProtocol {
     func onHabitUpdate(habit: Habit) {
         self.habit = habit
         navigationItem.title = habit.name
-//        habitTableView.removeFromSuperview()
-//        setupLayout()
     }
 }
 
@@ -95,13 +100,7 @@ extension HabitDetailsViewController: UITableViewDelegate {
 extension HabitDetailsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        var countDates: Int = 0
-        for date in HabitsStore.shared.dates {
-            if HabitsStore.shared.habit(habit, isTrackedIn: date) {
-                countDates += 1
-            }
-        }
-        return countDates
+        return HabitsStore.shared.dates.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -110,8 +109,10 @@ extension HabitDetailsViewController: UITableViewDataSource {
             for: indexPath
         ) as! HabitDetailViewCell
         
+        cell.textLabel?.text = dateFormatter.string(from: habitDates[indexPath.row])
         if HabitsStore.shared.habit(habit, isTrackedIn: habitDates[indexPath.row]) {
-            cell.textLabel?.text = dateFormatter.string(from: habitDates[indexPath.row])
+            cell.accessoryView = imageView
+            cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 22, height: 22)
         }
         
         return cell

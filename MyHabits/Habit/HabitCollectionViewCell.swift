@@ -59,12 +59,21 @@ class HabitCollectionViewCell: UICollectionViewCell {
         return button
     }()
     
+    private lazy var checkMarkImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage.init(systemName: "checkmark"))
+        imageView.tintColor = .white
+        imageView.toAutoLayout()
+        
+        return imageView
+    }()
+    
     @objc func checkBoxButtonPressed() {
         if !habit.isAlreadyTakenToday {
             HabitsStore.shared.track(habit)
             checkBoxButton.backgroundColor = habit.color
         }
         habitTapCallback?()
+        checkMarkImageView.isHidden = !habit.isAlreadyTakenToday
     }
     
     override init(frame: CGRect) {
@@ -86,7 +95,10 @@ class HabitCollectionViewCell: UICollectionViewCell {
         checkBoxButton.layer.borderColor = habit.color.cgColor
         trackerLabel.text = "Подряд: \(habit.trackDates.count)"
         
+        checkMarkImageView.isHidden = !habit.isAlreadyTakenToday
+        
         if habit.isAlreadyTakenToday {
+            
             checkBoxButton.backgroundColor = habit.color
         } else {
             checkBoxButton.backgroundColor = .white
@@ -101,6 +113,7 @@ class HabitCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(dateLabel)
         contentView.addSubview(trackerLabel)
         contentView.addSubview(checkBoxButton)
+        contentView.addSubview(checkMarkImageView)
         
         let constraints = [
             nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: baseInset),
@@ -116,7 +129,11 @@ class HabitCollectionViewCell: UICollectionViewCell {
             checkBoxButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -26),
             checkBoxButton.heightAnchor.constraint(equalToConstant: imageSize),
             checkBoxButton.widthAnchor.constraint(equalToConstant: imageSize),
-            checkBoxButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -47)
+            checkBoxButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -47),
+  
+            checkMarkImageView.centerXAnchor.constraint(equalTo: checkBoxButton.centerXAnchor),
+            checkMarkImageView.centerYAnchor.constraint(equalTo: checkBoxButton.centerYAnchor)
+            
         ]
         NSLayoutConstraint.activate(constraints)
     }
