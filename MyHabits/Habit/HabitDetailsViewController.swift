@@ -6,6 +6,7 @@
 //
 
 protocol HabitDetailsViewProtocol {
+    func onHabitUpdate(habit: Habit)
     func onHabitDelete()
 }
 
@@ -75,6 +76,12 @@ class HabitDetailsViewController: UIViewController {
 extension HabitDetailsViewController: HabitDetailsViewProtocol {
     func onHabitDelete() {
         navigationController?.popToRootViewController(animated: true)
+    }
+    func onHabitUpdate(habit: Habit) {
+        self.habit = habit
+        navigationItem.title = habit.name
+//        habitTableView.removeFromSuperview()
+//        setupLayout()
     }
 }
 

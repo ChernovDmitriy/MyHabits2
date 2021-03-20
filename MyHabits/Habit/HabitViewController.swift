@@ -151,6 +151,7 @@ class HabitViewController: UIViewController {
         }
         habitStore.save()
         updateCollectionCallback?.onCollectionUpdate()
+        habitDetailsViewCallback?.onHabitUpdate(habit: habit)
         dismiss(animated: true, completion: nil)
     }
     

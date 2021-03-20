@@ -94,6 +94,9 @@ class HabitsViewController: UIViewController, UpdateCollectionProtocol {
 extension HabitsViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if (indexPath.section == 0) {
+            return
+        }
         collectionView.deselectItem(at: indexPath, animated: true)
         let vc = HabitDetailsViewController()
         vc.habit = habitStore.habits[indexPath.item]
